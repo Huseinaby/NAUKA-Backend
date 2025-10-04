@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('id_number');
             $table->string('email')->unique();            
             $table->string('password');
-            $table->enum('role', ['admin', 'pelajar', 'pengajar'])->default('user');
+            $table->enum('role', ['admin', 'pelajar', 'pengajar'])->default('pelajar');
             $table->string('photo_profile')->nullable();
             $table->string('photo_evidence')->nullable();
             $table->rememberToken();
