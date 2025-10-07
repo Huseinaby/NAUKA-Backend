@@ -31,7 +31,7 @@ class materialController extends Controller
 
     public function getMostLiked()
     {
-        $material = Material::orderBy('likes', 'desc')->get();
+        $material = Material::withCount('likeBy')->orderBy('like_by_count', 'desc')->get();
 
         return response()->json([
             'message' => 'Most liked materials',

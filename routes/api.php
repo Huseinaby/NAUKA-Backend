@@ -27,3 +27,5 @@ Route::post('/materials', [materialController::class, 'store'])->middleware('aut
 Route::get('/materials/{id}', [materialController::class, 'show']);
 Route::put('/materials/{id}', [materialController::class, 'update'])->middleware('auth:sanctum');
 Route::delete('/materials/{id}', [materialController::class, 'destroy'])->middleware('auth:sanctum');
+Route::get('/materials/{id}/like', [materialController::class, 'toggleLike'])->middleware('auth:sanctum');
+
