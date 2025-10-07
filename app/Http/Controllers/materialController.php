@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\MaterialResource;
 use App\Models\Material;
 use Auth;
 use Illuminate\Http\Request;
@@ -10,21 +11,21 @@ class materialController extends Controller
 {
     public function index()
     {
-        $material = Material::inRandomOrder()->get();
+        $materials = Material::inRandomOrder()->get();
 
         return response()->json([
             'message' => 'Material index',
-            'data' => $material
+            'data' => MaterialResource::collection($materials),
         ]);
     }
 
     public function getNewest()
     {
-        $material = Material::orderBy('created_at', 'desc')->get();
+        $materials = Material::orderBy('created_at', 'desc')->get();
 
         return response()->json([
             'message' => 'Newest materials',
-            'data' => $material
+            'data' => MaterialResource::collection($materials),
         ]);
     }
 
@@ -34,7 +35,7 @@ class materialController extends Controller
 
         return response()->json([
             'message' => 'Most liked materials',
-            'data' => $material
+            'data' => MaterialResource::collection($material),
         ]);
     }
 
@@ -48,7 +49,7 @@ class materialController extends Controller
 
         return response()->json([
             'message' => 'Material details',
-            'data' => $material
+            'data' => new MaterialResource($material),
         ]);
     }
 
@@ -85,7 +86,7 @@ class materialController extends Controller
 
         return response()->json([
             'message' => 'Material created successfully',
-            'data' => $material
+            'data' => new MaterialResource($material)
         ], 201);
     }
 
@@ -170,7 +171,7 @@ class materialController extends Controller
 
         return response()->json([
             'message' => 'Material updated successfully',
-            'data' => $material
+            'data' => new MaterialResource($material)
         ]);
     }
 }
