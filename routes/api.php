@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\authController;
+use App\Http\Controllers\materialController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -12,3 +13,12 @@ Route::get('/user', function (Request $request) {
 Route::post('/register', [authController::class, 'register']);
 Route::post('/login', [authController::class,'login']);
 Route::post('/logout', [authController::class,'logout'])->middleware('auth:sanctum');
+
+//materials
+Route::get('/materials', [materialController::class, 'index']);
+Route::get('/materials/newest', [materialController::class, 'getNewest']);
+Route::get('/materials/most-liked', [materialController::class, 'getMostLiked']);
+Route::post('/materials', [materialController::class, 'store'])->middleware('auth:sanctum');
+Route::get('/materials/{id}', [materialController::class, 'show']);
+Route::put('/materials/{id}', [materialController::class, 'update'])->middleware('auth:sanctum');
+Route::delete('/materials/{id}', [materialController::class, 'destroy'])->middleware('auth:sanctum');
