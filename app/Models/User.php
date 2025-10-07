@@ -51,4 +51,14 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function materials()
+    {
+        return $this->hasMany(Material::class, 'user_id');
+    }
+
+    public function likes()
+    {
+        return $this->belongsToMany(Material::class, 'material_likes')->withTimestamps();
+    }
 }

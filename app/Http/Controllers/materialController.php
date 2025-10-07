@@ -174,4 +174,34 @@ class materialController extends Controller
             'data' => new MaterialResource($material)
         ]);
     }
+
+    public function toggleLike($id)
+    {
+        $user = Auth::user();
+
+        if (!$user) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $material = Material::find($id);
+
+        if (!$material) {
+            return response()->json(['message' => 'Material not found'], 404);
+        }
+
+        $liked = $material->likeBy()->where('user_id', $user->id)->exists();
+
+        if ($liked) {
+            $material->likeBy()->detach($user->id);            
+            $message = 'Material unliked';
+        } else {
+            $material->likeBy()->attach($user->id);            
+            $message = 'Material liked';
+        }
+
+        return response()->json([
+            'message' => $message,
+            'data' => new MaterialResource($material)
+        ]);
+    }
 }

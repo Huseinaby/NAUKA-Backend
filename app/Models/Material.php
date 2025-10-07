@@ -20,4 +20,9 @@ class Material extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function likeBy()
+    {
+        return $this->belongsToMany(User::class, 'material_likes')->withTimestamps();
+    }
 }
