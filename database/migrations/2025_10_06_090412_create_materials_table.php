@@ -15,10 +15,11 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('title');
-            $table->string('description');
+            $table->text('description');
             $table->integer('likes')->default(0);
-            $table->string('file_url');
-            $table->string('video_url')->nullable();
+            $table->string('image');
+            $table->string('file');
+            $table->string('video')->nullable();
             $table->timestamps();
         });
     }

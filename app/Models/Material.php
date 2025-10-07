@@ -11,8 +11,9 @@ class Material extends Model
         'title',
         'description',
         'likes',
-        'file_url',
-        'video_url',
+        'file',
+        'video',
+        'image'
     ];
 
     public function user()
