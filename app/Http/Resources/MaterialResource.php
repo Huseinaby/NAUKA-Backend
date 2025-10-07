@@ -18,7 +18,7 @@ class MaterialResource extends JsonResource
             'id' => $this->id,            
             'title' => $this->title,
             'description' => $this->description,
-            'likes' => $this->likes,
+            'likes' => $this->likeBy()->count(),
             'image' => asset('storage/' . $this->image),
             'file' => asset('storage/' . $this->file),
             'video' => $this->video ? asset($this->video) : null,            
