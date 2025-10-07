@@ -20,8 +20,8 @@ class MaterialResource extends JsonResource
             'title' => $this->title,
             'description' => $this->description,
             'likes' => $this->likes,
-            'image' => assert('storage/' . $this->image),
-            'file' => assert('storage/' . $this->file),
+            'image' => asset('storage/' . $this->image),
+            'file' => asset('storage/' . $this->file),
             'video' => $this->video ? asset($this->video) : null,
         ];
     }
