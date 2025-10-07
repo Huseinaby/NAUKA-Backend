@@ -25,7 +25,7 @@ class MaterialResource extends JsonResource
             'user' => [
                 'id'=> $this->user_id,
                 'name'=> $this->user->name,
-                'photo_profile'=> asset('storage/' . $this->user->photo_profile),
+                'photo_profile'=> asset( $this->user->photo_profile),
             ]
         ];
     }
