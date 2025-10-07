@@ -15,14 +15,18 @@ class MaterialResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id' => $this->id,
-            'user_id' => $this->user_id,
+            'id' => $this->id,            
             'title' => $this->title,
             'description' => $this->description,
             'likes' => $this->likes,
             'image' => asset('storage/' . $this->image),
             'file' => asset('storage/' . $this->file),
-            'video' => $this->video ? asset($this->video) : null,
+            'video' => $this->video ? asset($this->video) : null,            
+            'user' => [
+                'id'=> $this->user_id,
+                'name'=> $this->user->name,
+                'photo_profile'=> asset('storage/' . $this->user->photo_profile),
+            ]
         ];
     }
 }
