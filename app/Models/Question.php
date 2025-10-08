@@ -16,4 +16,9 @@ class Question extends Model
     {
         return $this->belongsTo(Material::class);
     }
+
+    public function options()
+    {
+        return $this->hasMany(Option::class);
+    }
 }
