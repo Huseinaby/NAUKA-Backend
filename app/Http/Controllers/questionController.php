@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\questionResource;
 use App\Models\Material;
 use App\Models\Option;
 use App\Models\Question;
 use Auth;
 use DB;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 
 class questionController extends Controller
@@ -85,7 +87,10 @@ class questionController extends Controller
 
             DB::commit();
 
-            return response()->json(['message' => 'Questions created successfully', 'questions' => $createdQuestions], 201);
+            return response()->json([
+                'message' => 'Questions created successfully',
+                'questions' => questionResource::collection($createdQuestions),
+            ], 201);
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json(['message' => 'An error occurred while creating questions.', 'error' => $e->getMessage()], 500);
@@ -99,14 +104,21 @@ class questionController extends Controller
         if (!$question) {
             return response()->json(['message' => 'Question not found'], 404);
         }
-        return response()->json($question, 200);
+
+        return response()->json([
+            'message' => 'Question retrieved successfully',
+            'question' => new questionResource($question)
+        ]);
     }
 
     public function getByMaterial($materialId)
     {
         $questions = Question::with('options')->where('material_id', $materialId)->get();
 
-        return response()->json($questions, 200);
+        return response()->json([
+            'message' => 'Questions retrieved successfully',
+            'questions' => questionResource::collection($questions)
+        ]);
     }
 
     public function update($id, Request $request)
@@ -128,14 +140,14 @@ class questionController extends Controller
 
         $validated = $request->validate([
             'questions' => 'required|array|max:1',
-            'question_text' => 'sometimes|string', 
-            'question_image' => 'sometimes|image|mimes:jpeg,png,jpg,gif,svg|max:2048', 
-            'options' => 'sometimes|array|min:2|max:4', 
-            'options.*.id' => 'sometimes|exists:options,id', 
-            'options.*.option_text' => 'nullable|string', 
-            'options.*.option_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', 
+            'question_text' => 'sometimes|string',
+            'question_image' => 'sometimes|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'options' => 'sometimes|array|min:2|max:4',
+            'options.*.id' => 'sometimes|exists:options,id',
+            'options.*.option_text' => 'nullable|string',
+            'options.*.option_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'options.*.is_correct' => 'required_with:options|boolean'
-        ]);        
+        ]);
 
         $questionData = $validated['questions'][0];
 
@@ -145,7 +157,7 @@ class questionController extends Controller
             if (isset($questionData['question_text'])) {
                 $question->question_text = $questionData['question_text'];
             }
-            
+
             if ($request->hasFile('questions.0.question_image')) {
                 if ($question->question_image) {
                     \Storage::disk('public')->delete(str_replace('storage/', '', $question->question_image));
@@ -155,7 +167,7 @@ class questionController extends Controller
                 $question->question_image = 'storage/' . $path;
             }
 
-            $question->save();            
+            $question->save();
             if (isset($questionData['options'])) {
                 $options = $questionData['options'];
                 $correctCount = collect($options)->where('is_correct', true)->count();
@@ -192,7 +204,7 @@ class questionController extends Controller
 
                             $option->save();
                         }
-                    } else {                        
+                    } else {
                         $newOption = new Option([
                             'question_id' => $question->id,
                             'option_text' => $optionData['option_text'] ?? null,
@@ -214,7 +226,7 @@ class questionController extends Controller
 
             return response()->json([
                 'message' => 'Question updated successfully',
-                'question' => $question->load('options')
+                'question' => new questionResource($question->load('options')),
             ], 200);
 
         } catch (\Exception $e) {
@@ -253,6 +265,8 @@ class questionController extends Controller
             }
         }
         $question->delete();
-        return response()->json(['message' => 'Question deleted successfully'], 200);
+        return response()->json([
+            'message' => 'Question deleted successfully'
+        ], 200);
     }
 }
