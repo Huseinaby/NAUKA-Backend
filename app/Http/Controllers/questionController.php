@@ -41,8 +41,8 @@ class questionController extends Controller
             $createdQuestions = [];
 
             foreach ($validateData['questions'] as $questionData) {
-                $questionImagePath = null;
-                if (isset($questionData['question_image'])) {
+                $questionImagePath = null;                
+                if (isset($questionData['question_image'])) {                    
                     $path = $questionData['question_image']->store('questions', 'public');
                     $questionImagePath = 'storage/' . $path;
                 }
@@ -84,5 +84,36 @@ class questionController extends Controller
             DB::rollBack();
             return response()->json(['message' => 'An error occurred while creating questions.', 'error' => $e->getMessage()], 500);
         }
+    }
+
+    public function destroy($id)
+    {
+        $user = Auth::user();
+
+        if (!$user || $user->role !== 'pengajar') {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $question = Question::find($id);
+        if (!$question) {
+            return response()->json(['message' => 'Question not found'], 404);
+        }
+
+        if($question->question_image) {
+            $imagePath = str_replace('storage/', 'public/', $question->question_image);
+            if (\Storage::exists($imagePath)) {
+                \Storage::delete($imagePath);
+            }
+        }
+        foreach ($question->options as $option) {
+            if ($option->option_image) {
+                $optionImagePath = str_replace('storage/', 'public/', $option->option_image);
+                if (\Storage::exists($optionImagePath)) {
+                    \Storage::delete($optionImagePath);
+                }
+            }
+        }
+        $question->delete();
+        return response()->json(['message' => 'Question deleted successfully'], 200);
     }
 }

@@ -32,3 +32,4 @@ Route::post('/materials/{id}/like', [materialController::class, 'toggleLike'])->
 
 //material questions
 Route::post('/materials/{id}/questions', [questionController::class, 'storeBatch'])->middleware('auth:sanctum');
+Route::delete('/materials/questions/{id}', [questionController::class, 'destroy'])->middleware('auth:sanctum');
