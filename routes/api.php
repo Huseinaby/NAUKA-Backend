@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\authController;
 use App\Http\Controllers\materialController;
+use App\Http\Controllers\questionController;
 use App\Http\Controllers\userController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -29,3 +30,5 @@ Route::put('/materials/{id}', [materialController::class, 'update'])->middleware
 Route::delete('/materials/{id}', [materialController::class, 'destroy'])->middleware('auth:sanctum');
 Route::post('/materials/{id}/like', [materialController::class, 'toggleLike'])->middleware('auth:sanctum');
 
+//material questions
+Route::post('/materials/{id}/questions', [questionController::class, 'storeBatch'])->middleware('auth:sanctum');
