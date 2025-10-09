@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Material;
 use App\Models\Option;
 use App\Models\Question;
 use Auth;
@@ -30,6 +31,11 @@ class questionController extends Controller
         ]);
 
         $materialId = $validateData['material_id'];
+
+        $material = Material::find($materialId);
+        if(!$material || $material->user_id !== $user->id){
+            return response()->json(['message' => 'You can only add questions to your own materials'], 403);
+        }
 
         $existingCount = Question::where('material_id', $materialId)->count();
         if ($existingCount + count($validateData['questions']) > 5) {
@@ -86,6 +92,27 @@ class questionController extends Controller
         }
     }
 
+    public function show($id)
+    {
+        $question = Question::with('options')->find($id);
+
+        if (!$question) {
+            return response()->json(['message' => 'Question not found'], 404);
+        }
+        return response()->json($question, 200);
+    }
+
+    public function getByMaterial($materialId)
+    {
+        $questions = Question::with('options')->where('material_id', $materialId)->get();
+
+        return response()->json($questions, 200);
+    }
+
+    public function update($id, Request $request){
+
+    }
+
     public function destroy($id)
     {
         $user = Auth::user();
@@ -97,6 +124,10 @@ class questionController extends Controller
         $question = Question::find($id);
         if (!$question) {
             return response()->json(['message' => 'Question not found'], 404);
+        }
+
+        if($question->material->user_id !== $user->id){
+            return response()->json(['message' => 'You can only delete questions from your own materials'], 403);
         }
 
         if ($question->question_image) {
