@@ -32,7 +32,7 @@ class questionController extends Controller
         $materialId = $validateData['material_id'];
 
         $existingCount = Question::where('material_id', $materialId)->count();
-        if($existingCount + count($validateData['questions']) > 5 ) {
+        if ($existingCount + count($validateData['questions']) > 5) {
             return response()->json(['message' => 'Adding these questions would exceed the maximum number of questions (5) for this material.'], 422);
         }
 
@@ -41,8 +41,8 @@ class questionController extends Controller
             $createdQuestions = [];
 
             foreach ($validateData['questions'] as $questionData) {
-                $questionImagePath = null;                
-                if (isset($questionData['question_image'])) {                    
+                $questionImagePath = null;
+                if (isset($questionData['question_image'])) {
                     $path = $questionData['question_image']->store('questions', 'public');
                     $questionImagePath = 'storage/' . $path;
                 }
@@ -99,18 +99,12 @@ class questionController extends Controller
             return response()->json(['message' => 'Question not found'], 404);
         }
 
-        if($question->question_image) {
-            $imagePath = str_replace('storage/', 'public/', $question->question_image);
-            if (\Storage::exists($imagePath)) {
-                \Storage::delete($imagePath);
-            }
+        if ($question->question_image) {
+            \Storage::disk('public')->delete(str_replace('storage/', '', $question->question_image));
         }
         foreach ($question->options as $option) {
             if ($option->option_image) {
-                $optionImagePath = str_replace('storage/', 'public/', $option->option_image);
-                if (\Storage::exists($optionImagePath)) {
-                    \Storage::delete($optionImagePath);
-                }
+                \Storage::disk('public')->delete(str_replace('storage/', '', $option->option_image));
             }
         }
         $question->delete();
