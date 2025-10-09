@@ -13,7 +13,7 @@ use Illuminate\Http\Request;
 
 class questionController extends Controller
 {
-    public function storeBatch(Request $request)
+    public function storeBatch($materialId, Request $request)
     {
         $user = Auth::user();
 
@@ -21,8 +21,7 @@ class questionController extends Controller
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
-        $validateData = $request->validate([
-            'material_id' => 'required|exists:materials,id',
+        $validateData = $request->validate([            
             'questions' => 'required|array|max:5',
             'questions.*.question_text' => 'nullable|string',
             'questions.*.question_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
@@ -32,7 +31,6 @@ class questionController extends Controller
             'questions.*.options.*.is_correct' => 'required|boolean',
         ]);
 
-        $materialId = $validateData['material_id'];
 
         $material = Material::find($materialId);
         if (!$material || $material->user_id !== $user->id) {
