@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -46,7 +47,7 @@ class authController extends Controller
 
         return response()->json([
             'message' => 'User registered successfully',
-            'user' => $user,
+            'user' => UserResource::make($user),
             'token' => $token
         ], 201);
     }
@@ -69,7 +70,7 @@ class authController extends Controller
         $token = $user->createToken('myapptoken')->plainTextToken;
 
         return response()->json([
-            'user' => $user,
+            'user' => UserResource::make($user),
             'token' => $token
         ], 200);
     }
