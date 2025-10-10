@@ -17,8 +17,10 @@ Route::post('/login', [authController::class,'login']);
 Route::post('/logout', [authController::class,'logout'])->middleware('auth:sanctum');
 
 //user profile
+Route::get('/users/pengajars', [userController::class, 'getAllPengajar'])->middleware('auth:sanctum');
 Route::get('/user/profile', [userController::class, 'profile'])->middleware('auth:sanctum');
 Route::put('/user/profile', [userController::class, 'update'])->middleware('auth:sanctum');
+
 
 //materials
 Route::get('/materials', [materialController::class, 'index']);

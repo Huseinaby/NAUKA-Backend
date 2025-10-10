@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\UserResource;
+use App\Models\User;
 use Auth;
 use Illuminate\Http\Request;
 
@@ -60,6 +61,16 @@ class userController extends Controller
         return response()->json([
             'message' => 'User profile updated successfully',
             'data' => new UserResource($user),
+        ], 200);
+    }
+
+    public function getAllPengajar()
+    {
+        $pengajars = User::where('role', 'pengajar')->get();
+
+        return response()->json([
+            'message' => 'List of all pengajars',
+            'data' => UserResource::collection($pengajars),
         ], 200);
     }
 }
