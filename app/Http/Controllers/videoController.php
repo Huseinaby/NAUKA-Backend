@@ -100,4 +100,31 @@ class videoController extends Controller
             'data' => $video
         ]);
     }
+
+    public function destroy($id)
+    {
+        $user = Auth::user();
+
+        if (!$user || $user->role !== 'pengajar') {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        $video = Video::find($id);
+
+        if (!$video) {
+            return response()->json(['message' => 'Video not found'], 404);
+        }
+
+        if ($video->user_id !== $user->id) {
+            return response()->json(['message' => 'Forbidden'], 403);
+        }
+
+        if ($video->video) {
+            \Storage::disk('public')->delete($video->video);
+        }
+
+        $video->delete();
+
+        return response()->json(['message' => 'Video deleted successfully']);
+    }
 }
