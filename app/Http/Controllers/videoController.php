@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\VideoResource;
 use App\Models\Video;
 use Auth;
 use Illuminate\Http\Request;
@@ -10,11 +11,11 @@ class videoController extends Controller
 {
     public function index()
     {
-        $video = Video::all();
+        $videos = Video::all();
 
         return response()->json([
             'status' => 'success',
-            'data' => $video
+            'data' => VideoResource::collection($videos)
         ]);
     }
 
@@ -28,7 +29,7 @@ class videoController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'data' => $video
+            'data' => new VideoResource($video)
         ]);
     }
 
@@ -58,7 +59,7 @@ class videoController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'data' => $video
+            'data' => new VideoResource($video)
         ], 201);
     }
 
@@ -97,7 +98,7 @@ class videoController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'data' => $video
+            'data' => new VideoResource($video)
         ]);
     }
 
