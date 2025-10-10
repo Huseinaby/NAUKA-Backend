@@ -10,7 +10,7 @@ class Video extends Model
         'user_id',
         'title',
         'description',
-        'url',
+        'video',
     ];
 
     public function user()

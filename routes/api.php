@@ -4,6 +4,7 @@ use App\Http\Controllers\authController;
 use App\Http\Controllers\materialController;
 use App\Http\Controllers\questionController;
 use App\Http\Controllers\userController;
+use App\Http\Controllers\videoController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -39,3 +40,7 @@ Route::get('/materials/{id}/questions', [questionController::class, 'getByMateri
 Route::get('/materials/questions/{id}', [questionController::class, 'show'])->middleware('auth:sanctum');
 Route::put('/materials/questions/{id}', [questionController::class, 'update'])->middleware('auth:sanctum');
 Route::delete('/materials/questions/{id}', [questionController::class, 'destroy'])->middleware('auth:sanctum');
+
+//videos
+Route::get('/videos', [videoController::class, 'index']);
+Route::post('/videos', [videoController::class, 'store'])->middleware('auth:sanctum');
