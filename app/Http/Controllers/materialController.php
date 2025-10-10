@@ -39,6 +39,16 @@ class materialController extends Controller
         ]);
     }
 
+    public function getByPengajar($pengajarId)
+    {
+        $materials = Material::where('user_id', $pengajarId)->get();
+
+        return response()->json([
+            'message' => 'Materials by pengajar',
+            'data' => MaterialResource::collection($materials),
+        ]);
+    }
+
     public function show($id)
     {
         $material = Material::find($id);
