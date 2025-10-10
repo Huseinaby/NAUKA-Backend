@@ -18,6 +18,20 @@ class videoController extends Controller
         ]);
     }
 
+    public function show($id)
+    {
+        $video = Video::find($id);
+        
+        if (!$video) {
+            return response()->json(['message' => 'Video not found'], 404);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $video
+        ]);
+    }
+
     public function store(Request $request)
     {
         $user = Auth::user();
