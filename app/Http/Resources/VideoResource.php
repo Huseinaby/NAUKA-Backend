@@ -23,7 +23,7 @@ class VideoResource extends JsonResource
             'user' => [
                 'id'=> $this->user_id,
                 'name'=> $this->user->name,
-                'profile_photo'=> $this->user->profile_photo ? asset('storage/' . $this->user->profile_photo) : null,
+                'photo_profile'=> $this->user->photo_profile ? asset('storage/' . $this->user->photo_profile) : null,
             ],
             'created_at' => $this->created_at?->format('Y-m-d H:i:s'),
             'updated_at' => $this->updated_at?->format('Y-m-d H:i:s'),
