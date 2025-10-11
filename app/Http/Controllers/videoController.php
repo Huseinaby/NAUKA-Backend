@@ -128,4 +128,34 @@ class videoController extends Controller
 
         return response()->json(['message' => 'Video deleted successfully']);
     }
+
+    public function toggleLike($id)
+    {
+        $user = Auth::user();
+
+        if (!$user) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        $video = Video::find($id);
+
+        if (!$video) {
+            return response()->json(['message' => 'Video not found'], 404);
+        }
+
+        $liked = $video->likeBy()->where('user_id', $user->id)->exists();
+
+        if($liked) {
+            $video->likeBy()->detach($user->id);
+            $message = 'Video unliked';
+        } else {
+            $video->likeBy()->attach($user->id);
+            $message = 'Video liked';
+        }
+
+        return response()->json([
+            'message' => $message,
+            'data' => new VideoResource($video)
+        ]);
+    }
 }
