@@ -43,6 +43,16 @@ class videoController extends Controller
         ]);
     }
 
+    public function getMostLiked()
+    {
+        $videos = Video::withCount('likeBy')->orderBy('like_by_count', 'desc')->get();
+
+        return response()->json([
+            'status' => 'success',
+            'data' => VideoResource::collection($videos)
+        ]);
+    }
+
     public function store(Request $request)
     {
         $user = Auth::user();
