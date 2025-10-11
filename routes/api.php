@@ -43,8 +43,9 @@ Route::delete('/materials/questions/{id}', [questionController::class, 'destroy'
 
 //videos
 Route::get('/videos', [videoController::class, 'index']);
+Route::get('/videos/newest', [videoController::class, 'getNewest']);
+Route::get('/videos/most-liked', [videoController::class, 'getMostLiked']);
 Route::get('/videos/{id}', [videoController::class, 'show'])->middleware('auth:sanctum');
-Route::get('/videos/most-liked', [videoController::class, 'getMostLiked'])->middleware('auth:sanctum');
 Route::post('/videos', [videoController::class, 'store'])->middleware('auth:sanctum');
 Route::put('/videos/{id}', [videoController::class, 'update'])->middleware('auth:sanctum');
 Route::delete('/videos/{id}', [videoController::class, 'destroy'])->middleware('auth:sanctum');

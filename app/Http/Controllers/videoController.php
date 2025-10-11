@@ -43,6 +43,16 @@ class videoController extends Controller
         ]);
     }
 
+    public function getNewest()
+    {
+        $videos = Video::orderBy('created_at', 'desc')->get();
+
+        return response()->json([
+            'status' => 'success',
+            'data' => VideoResource::collection($videos)
+        ]);
+    }
+
     public function getMostLiked()
     {
         $videos = Video::withCount('likeBy')->orderBy('like_by_count', 'desc')->get();
