@@ -18,6 +18,7 @@ class VideoResource extends JsonResource
             'id' => $this->id,
             'user_id' => $this->user_id,
             'title' => $this->title,
+            'likes' => $this->likeBy()->count(),
             'description' => $this->description,
             'video_url' => asset('storage/' . $this->video),
             'user' => [
