@@ -33,6 +33,16 @@ class videoController extends Controller
         ]);
     }
 
+    public function getByPengajar($pengajarId)
+    {
+        $videos = Video::where('user_id', $pengajarId)->get();
+
+        return response()->json([
+            'status' => 'success',
+            'data' => VideoResource::collection($videos)
+        ]);
+    }
+
     public function store(Request $request)
     {
         $user = Auth::user();

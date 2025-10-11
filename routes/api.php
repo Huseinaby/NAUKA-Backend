@@ -47,4 +47,5 @@ Route::get('/videos/{id}', [videoController::class, 'show'])->middleware('auth:s
 Route::post('/videos', [videoController::class, 'store'])->middleware('auth:sanctum');
 Route::put('/videos/{id}', [videoController::class, 'update'])->middleware('auth:sanctum');
 Route::delete('/videos/{id}', [videoController::class, 'destroy'])->middleware('auth:sanctum');
+Route::get('/videos/pengajar/{pengajarId}', [videoController::class, 'getByPengajar'])->middleware('auth:sanctum');
 Route::post('/videos/{id}/like', [videoController::class, 'toggleLike'])->middleware('auth:sanctum');
