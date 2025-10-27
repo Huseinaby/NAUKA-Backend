@@ -4,8 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\VideoResource;
 use App\Models\Video;
-use Auth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class videoController extends Controller
 {
@@ -119,7 +120,7 @@ class videoController extends Controller
 
         if ($request->hasFile('video')) {
             if ($video->video) {
-                \Storage::disk('public')->delete($video->video);
+                Storage::disk('public')->delete($video->video);
             }
             $validated['video'] = $request->file('video')->store('videos', 'public');
         }
@@ -151,7 +152,7 @@ class videoController extends Controller
         }
 
         if ($video->video) {
-            \Storage::disk('public')->delete($video->video);
+            Storage::disk('public')->delete($video->video);
         }
 
         $video->delete();

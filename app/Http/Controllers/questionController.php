@@ -6,10 +6,12 @@ use App\Http\Resources\questionResource;
 use App\Models\Material;
 use App\Models\Option;
 use App\Models\Question;
-use Auth;
-use DB;
+use Illuminate\Support\Facades\Auth;
+
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class questionController extends Controller
 {
@@ -158,7 +160,7 @@ class questionController extends Controller
 
             if ($request->hasFile('questions.0.question_image')) {
                 if ($question->question_image) {
-                    \Storage::disk('public')->delete(str_replace('storage/', '', $question->question_image));
+                    Storage::disk('public')->delete(str_replace('storage/', '', $question->question_image));
                 }
 
                 $path = $request->file('questions.0.question_image')->store('questions', 'public');
@@ -194,7 +196,7 @@ class questionController extends Controller
                             $fileKey = "questions.0.options.$index.option_image";
                             if ($request->hasFile($fileKey)) {
                                 if ($option->option_image) {
-                                    \Storage::disk('public')->delete(str_replace('storage/', '', $option->option_image));
+                                    Storage::disk('public')->delete(str_replace('storage/', '', $option->option_image));
                                 }
                                 $path = $request->file($fileKey)->store('options', 'public');
                                 $option->option_image = 'storage/' . $path;
@@ -255,11 +257,11 @@ class questionController extends Controller
         }
 
         if ($question->question_image) {
-            \Storage::disk('public')->delete(str_replace('storage/', '', $question->question_image));
+            Storage::disk('public')->delete(str_replace('storage/', '', $question->question_image));
         }
         foreach ($question->options as $option) {
             if ($option->option_image) {
-                \Storage::disk('public')->delete(str_replace('storage/', '', $option->option_image));
+                Storage::disk('public')->delete(str_replace('storage/', '', $option->option_image));
             }
         }
         $question->delete();

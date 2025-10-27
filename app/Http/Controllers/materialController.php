@@ -4,8 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\MaterialResource;
 use App\Models\Material;
-use Auth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class materialController extends Controller
 {
@@ -120,8 +121,8 @@ class materialController extends Controller
         }
 
         foreach (['image', 'file', 'video'] as $field) {
-            if ($material->$field && \Storage::disk('public')->exists($material->$field)) {
-                \Storage::disk('public')->delete($material->$field);
+            if ($material->$field && Storage::disk('public')->exists($material->$field)) {
+                Storage::disk('public')->delete($material->$field);
             }
         }
 
@@ -157,22 +158,22 @@ class materialController extends Controller
         ]);
 
         if ($request->hasFile('image')) {
-            if ($material->image && \Storage::disk('public')->exists($material->image)) {
-                \Storage::disk('public')->delete($material->image);
+            if ($material->image && Storage::disk('public')->exists($material->image)) {
+                Storage::disk('public')->delete($material->image);
             }
             $validateData['image'] = $request->file('image')->store('materials/images', 'public');
         }
 
         if ($request->hasFile('file')) {
-            if ($material->file && \Storage::disk('public')->exists($material->file)) {
-                \Storage::disk('public')->delete($material->file);
+            if ($material->file && Storage::disk('public')->exists($material->file)) {
+                Storage::disk('public')->delete($material->file);
             }
             $validateData['file'] = $request->file('file')->store('materials/files', 'public');
         }
 
         if ($request->hasFile('video')) {
-            if ($material->video && \Storage::disk('public')->exists($material->video)) {
-                \Storage::disk('public')->delete($material->video);
+            if ($material->video && Storage::disk('public')->exists($material->video)) {
+                Storage::disk('public')->delete($material->video);
             }
             $validateData['video'] = $request->file('video')->store('materials/videos', 'public');
         }
