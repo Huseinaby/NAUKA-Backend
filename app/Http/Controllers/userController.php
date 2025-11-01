@@ -4,8 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\UserResource;
 use App\Models\User;
-use Auth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class userController extends Controller
 {
@@ -37,16 +38,16 @@ class userController extends Controller
         ]);
 
         if ($request->hasFile('photo_profile')) {
-            if($user->photo_profile && \Storage::disk('public')->exists(str_replace('storage/', '', $user->photo_profile))) {
-                \Storage::disk('public')->delete(str_replace('storage/', '', $user->photo_profile));
+            if($user->photo_profile && Storage::disk('public')->exists(str_replace('storage/', '', $user->photo_profile))) {
+                Storage::disk('public')->delete(str_replace('storage/', '', $user->photo_profile));
             }
             $path = $request->file('photo_profile')->store('profiles', 'public');
             $validatedData['photo_profile'] = 'storage/' . $path;
         }
 
         if ($request->hasFile('photo_evidence')) {
-            if($user->photo_evidence && \Storage::disk('public')->exists(str_replace('storage/', '', $user->photo_evidence))) {
-                \Storage::disk('public')->delete(str_replace('storage/', '', $user->photo_evidence));
+            if($user->photo_evidence && Storage::disk('public')->exists(str_replace('storage/', '', $user->photo_evidence))) {
+                Storage::disk('public')->delete(str_replace('storage/', '', $user->photo_evidence));
             }
             $path = $request->file('photo_evidence')->store('evidences', 'public');
             $validatedData['photo_evidence'] = 'storage/' . $path;

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class authController extends Controller
 {
@@ -63,7 +64,7 @@ class authController extends Controller
         $user = User::where('username', $fields['username'])->first();
 
         // Check password
-        if (!$user || !\Hash::check($fields['password'], $user->password)) {
+        if (!$user || !Hash::check($fields['password'], $user->password)) {
             return response()->json(['message' => 'Invalid credentials'], 401);
         }
 
