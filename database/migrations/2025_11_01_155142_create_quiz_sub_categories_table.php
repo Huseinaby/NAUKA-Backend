@@ -13,6 +13,9 @@ return new class extends Migration
     {
         Schema::create('quiz_sub_categories', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('quiz_category_id')->constrained('quiz_categories')->onDelete('cascade');
+            $table->string('name');
+            $table->text('description')->nullable();
             $table->timestamps();
         });
     }
