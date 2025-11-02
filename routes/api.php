@@ -3,6 +3,7 @@
 use App\Http\Controllers\authController;
 use App\Http\Controllers\materialController;
 use App\Http\Controllers\questionController;
+use App\Http\Controllers\quizCategoryController;
 use App\Http\Controllers\userController;
 use App\Http\Controllers\videoController;
 use Illuminate\Http\Request;
@@ -51,3 +52,10 @@ Route::put('/videos/{id}', [videoController::class, 'update'])->middleware('auth
 Route::delete('/videos/{id}', [videoController::class, 'destroy'])->middleware('auth:sanctum');
 Route::get('/videos/pengajar/{pengajarId}', [videoController::class, 'getByPengajar'])->middleware('auth:sanctum');
 Route::post('/videos/{id}/like', [videoController::class, 'toggleLike'])->middleware('auth:sanctum');
+
+//quiz categories
+Route::get('/quiz-categories', [quizCategoryController::class, 'index']);
+Route::post('/quiz-categories', [quizCategoryController::class, 'store'])->middleware('auth:sanctum');
+Route::get('/quiz-categories/{id}', [quizCategoryController::class, 'show']);
+Route::put('/quiz-categories/{id}', [quizCategoryController::class, 'update'])->middleware('auth:sanctum');
+Route::delete('/quiz-categories/{id}', [quizCategoryController::class, 'destroy'])->middleware('auth:sanctum');
