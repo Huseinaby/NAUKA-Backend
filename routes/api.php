@@ -4,6 +4,7 @@ use App\Http\Controllers\authController;
 use App\Http\Controllers\materialController;
 use App\Http\Controllers\questionController;
 use App\Http\Controllers\quizCategoryController;
+use App\Http\Controllers\quizSubCategoryController;
 use App\Http\Controllers\userController;
 use App\Http\Controllers\videoController;
 use Illuminate\Http\Request;
@@ -59,3 +60,10 @@ Route::post('/quiz-categories', [quizCategoryController::class, 'store'])->middl
 Route::get('/quiz-categories/{id}', [quizCategoryController::class, 'show']);
 Route::put('/quiz-categories/{id}', [quizCategoryController::class, 'update'])->middleware('auth:sanctum');
 Route::delete('/quiz-categories/{id}', [quizCategoryController::class, 'destroy'])->middleware('auth:sanctum');
+
+//quiz sub-categories
+Route::get('/quiz-sub-categories', [quizSubCategoryController::class, 'index']);
+Route::post('/quiz-sub-categories', [quizSubCategoryController::class, 'store'])->middleware('auth:sanctum');
+Route::get('/quiz-sub-categories/{id}', [quizSubCategoryController::class, 'show']);
+Route::put('/quiz-sub-categories/{id}', [quizSubCategoryController::class, 'update'])->middleware('auth:sanctum');
+Route::delete('/quiz-sub-categories/{id}', [quizSubCategoryController::class, 'destroy'])->middleware('auth:sanctum');
