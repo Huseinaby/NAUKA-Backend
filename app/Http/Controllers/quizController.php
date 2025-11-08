@@ -19,5 +19,19 @@ class quizController extends Controller
             'message' => 'Quiz retrieved successfully',
             'quiz' => $quiz
         ]);
-    }    
+    }
+
+    public function getBySubCategory($subCategoryId)
+    {
+        $quizzes = Quiz::where('sub_category_id', $subCategoryId)->with('options')->get();
+
+        if ($quizzes->isEmpty()) {
+            return response()->json(['message' => 'No quizzes found for this sub-category'], 404);
+        }
+
+        return response()->json([
+            'message' => 'Quizzes retrieved successfully',
+            'quizzes' => $quizzes
+        ]);
+    }
 }
