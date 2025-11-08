@@ -4,6 +4,7 @@ use App\Http\Controllers\authController;
 use App\Http\Controllers\materialController;
 use App\Http\Controllers\questionController;
 use App\Http\Controllers\quizCategoryController;
+use App\Http\Controllers\quizController;
 use App\Http\Controllers\quizSubCategoryController;
 use App\Http\Controllers\userController;
 use App\Http\Controllers\videoController;
@@ -69,5 +70,5 @@ Route::put('/quiz-sub-categories/{id}', [quizSubCategoryController::class, 'upda
 Route::delete('/quiz-sub-categories/{id}', [quizSubCategoryController::class, 'destroy'])->middleware('auth:sanctum');
 
 //quizzes
-Route::get('/quizzes', [quizCategoryController::class, 'getAllQuizzes']);
+Route::get('/quiz/{id}', [quizController::class, 'show'])->middleware('auth:sanctum');
 
