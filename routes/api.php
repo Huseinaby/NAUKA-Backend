@@ -71,4 +71,5 @@ Route::delete('/quiz-sub-categories/{id}', [quizSubCategoryController::class, 'd
 
 //quizzes
 Route::get('/quiz/{id}', [quizController::class, 'show'])->middleware('auth:sanctum');
+Route::get('/quizzes/sub-category/{subCategoryId}', [quizController::class, 'getBySubCategory'])->middleware('auth:sanctum');
 
