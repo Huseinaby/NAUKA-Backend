@@ -22,4 +22,9 @@ class Quiz extends Model
     {
         return $this->belongsTo(QuizSubCategories::class, 'quiz_sub_category_id');
     }
+
+    public function choices()
+    {
+        return $this->hasMany(Choice::class, 'quiz_id');
+    }
 }

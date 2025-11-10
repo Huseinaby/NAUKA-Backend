@@ -9,7 +9,7 @@ class quizController extends Controller
 {
     public function show($id)
     {
-        $quiz = Quiz::with('options')->find($id);
+        $quiz = Quiz::with('choices')->find($id);
 
         if (!$quiz) {
             return response()->json(['message' => 'Quiz not found'], 404);
