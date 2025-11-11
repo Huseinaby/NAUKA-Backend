@@ -84,4 +84,21 @@ class quizSubCategoryController extends Controller
 
         return response()->json(['message' => 'Quiz sub-category deleted successfully']);
     }
+
+    public function getByCategory($categoryId) 
+    {
+        $quizSubCategories = QuizSubCategories::where('quiz_category_id', $categoryId)->get();
+
+        if ($quizSubCategories->empty()) {
+            return response()->json([
+                'message' => "No quiz sub-categories found for this category",
+                'data' => []
+            ], 404);
+        }
+
+        return response()->json([
+            'message' => 'Quiz sub-categories retrieved successfully',
+            'data' => $quizSubCategories
+        ], 200);
+    }
 }
