@@ -88,8 +88,8 @@ class quizSubCategoryController extends Controller
     public function getByCategory($categoryId) 
     {
         $quizSubCategories = QuizSubCategories::where('quiz_category_id', $categoryId)->get();
-
-        if ($quizSubCategories->empty()) {
+        
+        if ($quizSubCategories->isEmpty()) {
             return response()->json([
                 'message' => "No quiz sub-categories found for this category",
                 'data' => []
