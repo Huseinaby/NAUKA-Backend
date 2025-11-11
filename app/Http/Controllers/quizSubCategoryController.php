@@ -38,6 +38,7 @@ class quizSubCategoryController extends Controller
     public function store(Request $request)
     {
         $request->validate([
+            'quiz_category_id' => 'required|exists:quiz_categories,id',
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
         ]);
