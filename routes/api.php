@@ -55,6 +55,10 @@ Route::delete('/videos/{id}', [videoController::class, 'destroy'])->middleware('
 Route::get('/videos/pengajar/{pengajarId}', [videoController::class, 'getByPengajar'])->middleware('auth:sanctum');
 Route::post('/videos/{id}/like', [videoController::class, 'toggleLike'])->middleware('auth:sanctum');
 
+//quizzes
+Route::get('/quiz/{id}', [quizController::class, 'show']);
+Route::get('/quizzes/sub-category/{subCategoryId}', [quizController::class, 'getBySubCategory']);
+
 //quiz categories
 Route::get('/quiz-categories', [quizCategoryController::class, 'index']);
 Route::post('/quiz-categories', [quizCategoryController::class, 'store'])->middleware('auth:sanctum');
@@ -69,8 +73,3 @@ Route::get('/quiz-sub-categories/{id}', [quizSubCategoryController::class, 'show
 Route::get('/quiz-sub-categories/category/{categoryId}', [quizSubCategoryController::class, 'getByCategory']);
 Route::put('/quiz-sub-categories/{id}', [quizSubCategoryController::class, 'update'])->middleware('auth:sanctum');
 Route::delete('/quiz-sub-categories/{id}', [quizSubCategoryController::class, 'destroy'])->middleware('auth:sanctum');
-
-//quizzes
-Route::get('/quiz/{id}', [quizController::class, 'show'])->middleware('auth:sanctum');
-Route::get('/quizzes/sub-category/{subCategoryId}', [quizController::class, 'getBySubCategory'])->middleware('auth:sanctum');
-
