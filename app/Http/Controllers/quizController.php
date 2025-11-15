@@ -38,12 +38,10 @@ class quizController extends Controller
     public function storeBatch(Request $request)
     {
         $request->validate([
+            'category_id' => 'required|integer|exists:categories,id',
+            'sub_category_id' => 'required|integer|exists:sub_categories,id',
             'quizzes' => 'required|array',
-            'quizzes.*.question' => 'required|string',
-            'quizzes.*.sub_category_id' => 'required|integer',
-            'quizzes.*.options' => 'required|array|min:2',
-            'quizzes.*.options.*.text' => 'required|string',
-            'quizzes.*.options.*.is_correct' => 'required|boolean',
+            'quizzes.*.quiz_text' => 'required|string',
         ]);
 
         $createdQuizzes = [];

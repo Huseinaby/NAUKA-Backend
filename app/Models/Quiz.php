@@ -13,6 +13,11 @@ class Quiz extends Model
         'created_by',
     ];
 
+    public function category()
+    {
+        return $this->belongsTo(QuizCategories::class, 'category_id');
+    }
+
     public function subCategory()
     {
         return $this->belongsTo(QuizSubCategories::class, 'sub_category_id');
