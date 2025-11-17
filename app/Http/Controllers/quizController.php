@@ -276,4 +276,31 @@ class quizController extends Controller
             return response()->json(['message' => 'Failed to update quiz', 'error' => $e->getMessage()], 500);
         }
     }
+
+    public function destroy($id)
+    {
+        $user = Auth::user();
+
+        if (!$user || !$user->role === 'pengajar') {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $quiz = Quiz::find($id);
+        if (!$quiz) {
+            return response()->json(['message' => 'Quiz not found'], 404);
+        }
+
+        if ($quiz->quiz_image) {
+            Storage::disk('public')->delete(str_replace('Storage/', '', $quiz->quiz_image));
+        }
+
+        foreach ($quiz->choices as $choice) {
+            if ($choice->choice_image) {
+                Storage::disk('public')->delete(str_replace('Storage/', '', $choice->choice_image));
+            }
+        }
+
+        $quiz->delete();
+        return response()->json(['message' => 'Quiz deleted successfully'], 200);
+    }
 }
