@@ -7,7 +7,9 @@ use App\Models\Quiz;
 use App\Models\QuizCategories;
 use App\Models\QuizSubCategories;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Storage;
 
 class quizController extends Controller
 {
@@ -180,29 +182,98 @@ class quizController extends Controller
 
     public function update(Request $request, $id)
     {
-        $quiz = Quiz::find($id);
+        $user = Auth::user();
 
+        if (!$user || !$user->role === 'pengajar') {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $quiz = Quiz::find($id);
         if (!$quiz) {
             return response()->json(['message' => 'Quiz not found'], 404);
         }
 
-        $request->validate([
-            'question' => 'sometimes|required|string',
-            'sub_category_id' => 'sometimes|required|integer',
+        $validateData = $request->validate([
+            'quiz_text' => 'sometimes|required|string',
+            'quiz_image' => 'sometimes|nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'choises' => 'sometimes|required|array|min:2|max:4',
+            'choises.*.id' => 'sometimes|integer|exists:choices,id',
+            'choises.*.choises_text' => 'sometimes|required|string',
+            'choises.*.choises_image' => 'sometimes|nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'choises.*.is_correct' => 'sometimes|required|boolean',
         ]);
 
-        if ($request->has('question')) {
-            $quiz->question = $request->question;
-        }
-        if ($request->has('sub_category_id')) {
-            $quiz->sub_category_id = $request->sub_category_id;
-        }
+        DB::beginTransaction();
 
-        $quiz->save();
+        try {
+            if ($request->filled('quiz_text')) {
+                $quiz->quiz_text = $validateData['quiz_text'];
+            }
 
-        return response()->json([
-            'message' => 'Quiz updated successfully',
-            'quiz' => $quiz
-        ]);
+            if ($request->hasFile('quiz_image')) {
+                if ($quiz->quiz_image) {
+                    Storage::disk('public')->delete(str_replace('Storage/', '', $quiz->quiz_image));
+                }
+                $path = $validateData['quiz_image']->store('quiz_images', 'public');
+                $quiz->quiz_image = 'Storage/' . $path;
+            }
+
+            $quiz->save();
+
+            if ($request->has('choises')) {
+
+                $choices = $validateData['choises'];
+
+                if (collect($choices)->where('is_correct', true)->count() !== 1) {
+                    DB::rollBack();
+                    return response()->json(['message' => 'Each quiz must have exactly one correct choice'], 400);
+                }
+
+                $existingChoiceIds = $quiz->choices->keyBy('id');
+
+                foreach ($choices as $index => $cho) {
+
+                    if (isset($cho['id'])) {
+                        $choice = $existingChoiceIds[$cho['id']];
+
+                        $choice->choice_text = $cho['choises_text'] ?? $choice->choice_text; 
+                        $choice->is_correct = $cho['is_correct'];
+
+                        if ($request->hasFile("choises.$index.choises_image")) {
+                            if ($choice->choice_image) {
+                                Storage::disk('public')->delete(str_replace('Storage/', '', $choice->choice_image));
+                            }
+                            $path = $cho['choises_image']->store('choice_images', 'public');
+                            $choice->choice_image = 'Storage/' . $path;
+                        }
+                        $choice->save();
+                    }
+
+                    else {
+                        $newChoice = new Choice([
+                            'quiz_id' => $quiz->id,
+                            'choice_text' => $cho['choises_text'],
+                            'is_correct' => $cho['is_correct'],
+                        ]);
+
+                        if ($request->hasFile("choises.$index.choises_image")) {
+                            $path = $cho['choises_image']->store('choice_images', 'public');
+                            $newChoice->choice_image = 'Storage/' . $path;
+                        }
+
+                        $newChoice->save();
+                    }
+                }
+            }
+            DB::commit();
+
+            return response()->json([
+                'message' => 'Quiz updated successfully',
+                'quiz' => $quiz->load('choices')
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['message' => 'Failed to update quiz', 'error' => $e->getMessage()], 500);
+        }
     }
 }
