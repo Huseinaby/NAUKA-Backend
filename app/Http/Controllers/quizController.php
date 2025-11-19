@@ -43,19 +43,21 @@ class quizController extends Controller
 
     public function storeBatch(Request $request)
     {
+
         $validateData = $request->validate([
-            'category_id' => 'required|integer|exists:categories,id',
-            'sub_category_id' => 'required|integer|exists:sub_categories,id',
+            'category_id' => 'required|integer|exists:quiz_categories,id',
+            'sub_category_id' => 'required|integer|exists:quiz_sub_categories,id',
             'quizzes' => 'required|array',
             'quizzes.*.quiz_text' => 'required|string',
             'quizzes.*.quiz_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'quizzes.*.choises' => 'required|array|min:2',
-            'quizzes.*.choises.*.choises_text' => 'required|string',
+            'quizzes.*.choises.*.choises_text' => 'nullable|string',
             'quizzes.*.choises.*.choises_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'quizzes.*.choises.*.is_correct' => 'required|boolean',
         ]);
 
-        $category = QuizCategories::find($request->category_id);
+        
+        $category = QuizCategories::find($request->category_id);        
         $subCategory = QuizSubCategories::find($request->sub_category_id);
         if (!$category || !$subCategory || $subCategory->category_id !== $category->id) {
             return response()->json(['message' => 'Invalid category or sub-category'], 400);
@@ -113,13 +115,13 @@ class quizController extends Controller
         }
     }
 
-    public function store(Request $request) 
+    public function store(Request $request)
     {
         $validateData = $request->validate([
             'category_id' => 'required|integer|exists:categories,id',
             'sub_category_id' => 'required|integer|exists:sub_categories,id',
             'quiz_text' => 'required|string',
-            'quiz_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',    
+            'quiz_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'choises' => 'required|array|min:2',
             'choises.*.choises_text' => 'required|string',
             'choises.*.choises_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
@@ -236,7 +238,7 @@ class quizController extends Controller
                     if (isset($cho['id'])) {
                         $choice = $existingChoiceIds[$cho['id']];
 
-                        $choice->choice_text = $cho['choises_text'] ?? $choice->choice_text; 
+                        $choice->choice_text = $cho['choises_text'] ?? $choice->choice_text;
                         $choice->is_correct = $cho['is_correct'];
 
                         if ($request->hasFile("choises.$index.choises_image")) {
@@ -247,9 +249,7 @@ class quizController extends Controller
                             $choice->choice_image = 'Storage/' . $path;
                         }
                         $choice->save();
-                    }
-
-                    else {
+                    } else {
                         $newChoice = new Choice([
                             'quiz_id' => $quiz->id,
                             'choice_text' => $cho['choises_text'],
