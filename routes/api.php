@@ -58,6 +58,7 @@ Route::post('/videos/{id}/like', [videoController::class, 'toggleLike'])->middle
 //quizzes
 Route::get('/quiz/{id}', [quizController::class, 'show']);
 Route::get('/quizzes/sub-category/{subCategoryId}', [quizController::class, 'getBySubCategory']);
+Route::post('/quizzes', [quizController::class, 'store'])->middleware('auth:sanctum');
 Route::post('/quizzes/batch', [quizController::class, 'storeBatch'])->middleware('auth:sanctum');
 Route::put('/quizzes/{id}', [quizController::class, 'update'])->middleware('auth:sanctum');
 Route::delete('/quizzes/{id}', [quizController::class, 'destroy'])->middleware('auth:sanctum');
