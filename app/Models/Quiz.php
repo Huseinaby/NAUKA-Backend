@@ -7,10 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 class Quiz extends Model
 {
     protected $fillable = [
-        'title',
-        'description',
-        'sub_category_id',
-        'created_by',
+        'quiz_category_id',
+        'quiz_sub_category_id',
+        'quiz_text',
+        'quiz_image',
     ];
 
     public function category()
