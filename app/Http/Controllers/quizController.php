@@ -29,7 +29,7 @@ class quizController extends Controller
 
     public function getBySubCategory($subCategoryId)
     {
-        $quizzes = Quiz::where('sub_category_id', $subCategoryId)->with('options')->get();
+        $quizzes = Quiz::where('quiz_sub_category_id', $subCategoryId)->with('choices')->get();
 
         if ($quizzes->isEmpty()) {
             return response()->json(['message' => 'No quizzes found for this sub-category'], 404);
