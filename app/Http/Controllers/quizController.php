@@ -117,19 +117,20 @@ class quizController extends Controller
     public function store(Request $request)
     {
         $validateData = $request->validate([
-            'category_id' => 'required|integer|exists:categories,id',
-            'sub_category_id' => 'required|integer|exists:sub_categories,id',
+            'category_id' => 'required|integer|exists:quiz_categories,id',
+            'sub_category_id' => 'required|integer|exists:quiz_sub_categories,id',
             'quiz_text' => 'required|string',
             'quiz_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'choises' => 'required|array|min:2',
-            'choises.*.choises_text' => 'required|string',
-            'choises.*.choises_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'choises.*.is_correct' => 'required|boolean',
+            'choices' => 'required|array|min:2',
+            'choices.*.choice_text' => 'nullable|string',
+            'choices.*.choice_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'choices.*.is_correct' => 'required|boolean',
         ]);
+        
 
         $category = QuizCategories::find($request->category_id);
         $subCategory = QuizSubCategories::find($request->sub_category_id);
-        if (!$category || !$subCategory || $subCategory->category_id !== $category->id) {
+        if (!$category || !$subCategory || $subCategory->quiz_category_id !== $category->id) {
             return response()->json(['message' => 'Invalid category or sub-category'], 400);
         }
 
@@ -149,22 +150,22 @@ class quizController extends Controller
                 'quiz_image' => $quizImagePath,
             ]);
 
-            $correctCount = collect($validateData['choises'])->where('is_correct', true)->count();
+            $correctCount = collect($validateData['choices'])->where('is_correct', true)->count();
             if ($correctCount !== 1) {
                 DB::rollBack();
                 return response()->json(['message' => 'Each quiz must have exactly one correct choice'], 400);
             }
 
-            foreach ($validateData['choises'] as $choiceData) {
+            foreach ($validateData['choices'] as $choiceData) {                
                 $choiceImagePath = null;
-                if (isset($choiceData['choises_image'])) {
-                    $path = $choiceData['choises_image']->store('choice_images', 'public');
+                if (isset($choiceData['choice_image'])) {
+                    $path = $choiceData['choice_image']->store('choice_images', 'public');
                     $choiceImagePath = 'Storage/' . $path;
                 }
 
                 Choice::create([
                     'quiz_id' => $quiz->id,
-                    'choice_text' => $choiceData['choises_text'],
+                    'choice_text' => $choiceData['choice_text'] ?? '',
                     'choice_image' => $choiceImagePath,
                     'is_correct' => $choiceData['is_correct'],
                 ]);
