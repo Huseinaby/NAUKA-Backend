@@ -16,8 +16,8 @@ class QuizResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'category_id' => $this->category_id,
-            'sub_category_id' => $this->sub_category_id,
+            'category_id' => $this->quiz_category_id,
+            'sub_category_id' => $this->quiz_sub_category_id,
             'quiz_text' => $this->quiz_text,
             'quiz_image' => $this->quiz_image ? asset($this->quiz_image) : null,
             'choices' => ChoiceResource::collection($this->whenLoaded('choices')),

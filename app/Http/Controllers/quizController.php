@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\QuizResource;
 use App\Models\Choice;
 use App\Models\Quiz;
 use App\Models\QuizCategories;
@@ -23,7 +24,7 @@ class quizController extends Controller
 
         return response()->json([
             'message' => 'Quiz retrieved successfully',
-            'quiz' => $quiz
+            'quiz' => QuizResource::make($quiz)
         ]);
     }
 
@@ -37,7 +38,7 @@ class quizController extends Controller
 
         return response()->json([
             'message' => 'Quizzes retrieved successfully',
-            'quizzes' => $quizzes
+            'quizzes' => QuizResource::collection($quizzes)
         ]);
     }
 
@@ -106,7 +107,7 @@ class quizController extends Controller
             DB::commit();
             return response()->json([
                 'message' => 'Quizzes created successfully',
-                'quizzes' => $createdQuizzes
+                'quizzes' => QuizResource::collection(collect($createdQuizzes))
             ], 201);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -174,7 +175,7 @@ class quizController extends Controller
             DB::commit();
             return response()->json([
                 'message' => 'Quiz created successfully',
-                'quiz' => $quiz->load('choices')
+                'quiz' => QuizResource::make($quiz->load('choices'))
             ], 201);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -269,7 +270,7 @@ class quizController extends Controller
 
             return response()->json([
                 'message' => 'Quiz updated successfully',
-                'quiz' => $quiz->load('choices')
+                'quiz' => QuizResource::make($quiz->load('choices'))
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
