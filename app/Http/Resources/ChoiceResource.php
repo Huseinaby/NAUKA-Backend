@@ -14,6 +14,11 @@ class ChoiceResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        return [
+            'id' => $this->id,            
+            'choice_text' => $this->choice_text,
+            'choice_image' => $this->choice_image ? asset($this->choice_image) : null,
+            'is_correct' => $this->is_correct,
+        ];
     }
 }
