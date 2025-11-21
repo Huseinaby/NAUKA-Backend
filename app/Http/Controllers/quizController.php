@@ -198,11 +198,11 @@ class quizController extends Controller
         $validateData = $request->validate([
             'quiz_text' => 'sometimes|required|string',
             'quiz_image' => 'sometimes|nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'choises' => 'sometimes|required|array|min:2|max:4',
-            'choises.*.id' => 'sometimes|integer|exists:choices,id',
-            'choises.*.choises_text' => 'sometimes|required|string',
-            'choises.*.choises_image' => 'sometimes|nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'choises.*.is_correct' => 'sometimes|required|boolean',
+            'choices' => 'sometimes|required|array|min:2|max:4',
+            'choices.*.id' => 'sometimes|integer|exists:choices,id',
+            'choices.*.choice_text' => 'sometimes|required|string',
+            'choices.*.choice_image' => 'sometimes|nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'choices.*.is_correct' => 'sometimes|required|boolean',
         ]);
 
         DB::beginTransaction();
@@ -222,9 +222,9 @@ class quizController extends Controller
 
             $quiz->save();
 
-            if ($request->has('choises')) {
+            if ($request->has('choices')) {
 
-                $choices = $validateData['choises'];
+                $choices = $validateData['choices'];
 
                 if (collect($choices)->where('is_correct', true)->count() !== 1) {
                     DB::rollBack();
@@ -238,26 +238,26 @@ class quizController extends Controller
                     if (isset($cho['id'])) {
                         $choice = $existingChoiceIds[$cho['id']];
 
-                        $choice->choice_text = $cho['choises_text'] ?? $choice->choice_text;
+                        $choice->choice_text = $cho['choice_text'] ?? $choice->choice_text;
                         $choice->is_correct = $cho['is_correct'];
 
-                        if ($request->hasFile("choises.$index.choises_image")) {
+                        if ($request->hasFile("choices.$index.choice_image")) {
                             if ($choice->choice_image) {
                                 Storage::disk('public')->delete(str_replace('Storage/', '', $choice->choice_image));
                             }
-                            $path = $cho['choises_image']->store('choice_images', 'public');
+                            $path = $cho['choice_image']->store('choice_images', 'public');
                             $choice->choice_image = 'Storage/' . $path;
                         }
                         $choice->save();
                     } else {
                         $newChoice = new Choice([
                             'quiz_id' => $quiz->id,
-                            'choice_text' => $cho['choises_text'],
+                            'choice_text' => $cho['choice_text'],
                             'is_correct' => $cho['is_correct'],
                         ]);
 
-                        if ($request->hasFile("choises.$index.choises_image")) {
-                            $path = $cho['choises_image']->store('choice_images', 'public');
+                        if ($request->hasFile("choices.$index.choices_image")) {
+                            $path = $cho['choice_image']->store('choice_images', 'public');
                             $newChoice->choice_image = 'Storage/' . $path;
                         }
 
