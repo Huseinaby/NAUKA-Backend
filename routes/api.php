@@ -62,7 +62,7 @@ Route::post('/quizzes', [quizController::class, 'store'])->middleware('auth:sanc
 Route::post('/quizzes/batch', [quizController::class, 'storeBatch'])->middleware('auth:sanctum');
 Route::put('/quizzes/{id}', [quizController::class, 'update'])->middleware('auth:sanctum');
 Route::delete('/quizzes/{id}', [quizController::class, 'destroy'])->middleware('auth:sanctum');
-
+Route::post('/quizzes/result', [quizController::class, 'resultStore'])->middleware('auth:sanctum');
 
 //quiz categories
 Route::get('/quiz-categories', [quizCategoryController::class, 'index']);

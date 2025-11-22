@@ -6,6 +6,7 @@ use App\Http\Resources\QuizResource;
 use App\Models\Choice;
 use App\Models\Quiz;
 use App\Models\QuizCategories;
+use App\Models\QuizResult;
 use App\Models\QuizSubCategories;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -57,8 +58,8 @@ class quizController extends Controller
             'quizzes.*.choices.*.is_correct' => 'required|boolean',
         ]);
 
-        
-        $category = QuizCategories::find($request->category_id);        
+
+        $category = QuizCategories::find($request->category_id);
         $subCategory = QuizSubCategories::find($request->sub_category_id);
         if (!$category || !$subCategory || $subCategory->quiz_category_id !== $category->id) {
             return response()->json(['message' => 'Invalid category or sub-category'], 400);
@@ -74,14 +75,14 @@ class quizController extends Controller
                 if (isset($quizData['quiz_image'])) {
                     $path = $quizData['quiz_image']->store('quiz_images', 'public');
                     $quizImagePath = 'Storage/' . $path;
-                }                
+                }
 
                 $quiz = Quiz::create([
                     'quiz_category_id' => $category->id,
                     'quiz_sub_category_id' => $subCategory->id,
                     'quiz_text' => $quizData['quiz_text'],
                     'quiz_image' => $quizImagePath,
-                ]);            
+                ]);
 
                 $correctCount = collect($quizData['choices'])->where('is_correct', true)->count();
                 if ($correctCount !== 1) {
@@ -94,7 +95,7 @@ class quizController extends Controller
                     if (isset($choiceData['choice_image'])) {
                         $path = $choiceData['choice_image']->store('choice_images', 'public');
                         $choiceImagePath = 'Storage/' . $path;
-                    }                    
+                    }
                     Choice::create([
                         'quiz_id' => $quiz->id,
                         'choice_text' => $choiceData['choice_text'] ?? '',
@@ -127,7 +128,7 @@ class quizController extends Controller
             'choices.*.choice_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'choices.*.is_correct' => 'required|boolean',
         ]);
-        
+
 
         $category = QuizCategories::find($request->category_id);
         $subCategory = QuizSubCategories::find($request->sub_category_id);
@@ -157,7 +158,7 @@ class quizController extends Controller
                 return response()->json(['message' => 'Each quiz must have exactly one correct choice'], 400);
             }
 
-            foreach ($validateData['choices'] as $choiceData) {                
+            foreach ($validateData['choices'] as $choiceData) {
                 $choiceImagePath = null;
                 if (isset($choiceData['choice_image'])) {
                     $path = $choiceData['choice_image']->store('choice_images', 'public');
@@ -303,5 +304,62 @@ class quizController extends Controller
 
         $quiz->delete();
         return response()->json(['message' => 'Quiz deleted successfully'], 200);
+    }
+
+    public function resultStore(Request $request)
+    {
+        $validated = $request->validate([
+            'sub_category_id' => 'required|exists:quiz_sub_categories,id',
+            'answers' => 'required|array',
+            'answers.*' => 'required|integer|exists:choices,id',
+        ]);
+
+        $user = Auth::user();
+
+        if (!$user) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        $answers = $request->answers;
+
+        $totalQuizzes = count($answers);
+        $correctCount = 0;
+
+        foreach ($answers as $quizId => $choiceId) {
+            $choice = Choice::where('id', $choiceId)
+                ->where('quiz_id', $quizId)
+                ->first();
+
+            if (!$choice) {
+                continue;
+            }
+
+            if ($choice->is_correct) {
+                $correctCount++;
+            }
+
+            $score = $totalQuizzes > 0 ? round(($correctCount / $totalQuizzes) * 100) : 0;
+        }
+
+        $totalWrong = $totalQuizzes - $correctCount;
+
+        $result = QuizResult::create([
+            'user_id' => $user->id,
+            'sub_category_id' => $request->sub_category_id,
+            'score' => $score,
+            'correct' => $correctCount,
+            'wrong' => $totalWrong,
+            'total_quizzes' => $totalQuizzes
+        ]);
+
+        return response()->json([
+            'message' => 'Quiz result saved successfully',
+            'data' => [
+                'score' => $score,
+                'correct' => $correctCount,
+                'wrong' => $totalWrong,
+                'quizResult_id' => $result->id
+            ]
+        ], 200);
     }
 }

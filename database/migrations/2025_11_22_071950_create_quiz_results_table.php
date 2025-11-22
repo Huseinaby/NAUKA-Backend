@@ -18,7 +18,7 @@ return new class extends Migration
             $table->integer('score');
             $table->integer('correct');
             $table->integer('wrong');
-            $table->integer('total_questions');
+            $table->integer('total_quizzes');
             $table->timestamps();
         });
     }
