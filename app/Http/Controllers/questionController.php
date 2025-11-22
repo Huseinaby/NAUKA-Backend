@@ -6,6 +6,7 @@ use App\Http\Resources\questionResource;
 use App\Models\Material;
 use App\Models\Option;
 use App\Models\Question;
+use App\Models\QuestionResult;
 use Illuminate\Support\Facades\Auth;
 
 use Illuminate\Database\Eloquent\Collection;
@@ -23,7 +24,7 @@ class questionController extends Controller
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
-        $validateData = $request->validate([            
+        $validateData = $request->validate([
             'questions' => 'required|array|max:5',
             'questions.*.question_text' => 'nullable|string',
             'questions.*.question_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
@@ -138,7 +139,7 @@ class questionController extends Controller
             return response()->json(['message' => 'You can only update questions from your own materials'], 403);
         }
 
-        $validated = $request->validate([            
+        $validated = $request->validate([
             'question_text' => 'sometimes|string',
             'question_image' => 'sometimes|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'options' => 'sometimes|array|min:2|max:4',
@@ -146,8 +147,8 @@ class questionController extends Controller
             'options.*.option_text' => 'nullable|string',
             'options.*.option_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'options.*.is_correct' => 'required_with:options|boolean'
-        ]);                
-    
+        ]);
+
         DB::beginTransaction();
         try {
 
@@ -225,7 +226,6 @@ class questionController extends Controller
                 'message' => 'Question updated successfully',
                 'question' => new questionResource($question->load('options')),
             ], 200);
-
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json([
@@ -265,5 +265,56 @@ class questionController extends Controller
         return response()->json([
             'message' => 'Question deleted successfully'
         ], 200);
+    }
+
+    public function storeResult(Request $request) {
+        $validated = $request->validate([
+            'material_id' => 'required|exists:materials,id',
+            'answers' => 'required|array',
+            'answers.*' => 'required|integer|exists:options,id',
+        ]);
+
+        $user = Auth::user();
+        if (!$user) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $answers = $validated['answers'];
+
+        $totalQuestions = count($answers);
+        $correctAnswers = 0;
+
+        foreach ($answers as $questionId => $optionId) {
+            $option = Option::where('id', $optionId)
+                            ->where('question_id', $questionId)
+                            ->first();
+
+            if ($option && $option->is_correct) {
+                $correctAnswers++;
+            }            
+
+        }
+
+        $score = $totalQuestions > 0 ? round(($correctAnswers / $totalQuestions) * 100) : 0;
+
+        $result = QuestionResult::create([
+            'user_id' => $user->id,
+            'material_id' => $validated['material_id'],
+            'score' => $score,
+            'correct' => $correctAnswers,
+            'wrong' => $totalQuestions - $correctAnswers,
+            'total_question' => $totalQuestions,            
+        ]);
+
+        return response()->json([
+            'message' => 'Quiz result stored successfully',
+            'data' => [
+                'score' => $score,
+                'correct' => $correctAnswers,
+                'wrong' => $totalQuestions - $correctAnswers,
+                'result_id' => $result->id
+            ]
+        ], 201);
+    
     }
 }

@@ -337,9 +337,9 @@ class quizController extends Controller
             if ($choice->is_correct) {
                 $correctCount++;
             }
-
-            $score = $totalQuizzes > 0 ? round(($correctCount / $totalQuizzes) * 100) : 0;
         }
+        
+        $score = $totalQuizzes > 0 ? round(($correctCount / $totalQuizzes) * 100) : 0;
 
         $totalWrong = $totalQuizzes - $correctCount;
 

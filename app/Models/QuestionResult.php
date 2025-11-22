@@ -12,7 +12,7 @@ class questionResult extends Model
         'score',
         'correct',
         'wrong',
-        'total_questions'
+        'total_question'
     ];
 
     public function users()
