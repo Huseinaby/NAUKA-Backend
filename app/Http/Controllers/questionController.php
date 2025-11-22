@@ -48,26 +48,26 @@ class questionController extends Controller
         try {
             $createdQuestions = [];
 
-            foreach ($validateData['questions'] as $questionData) {
+            foreach ($validateData['questions'] as $validated) {
                 $questionImagePath = null;
-                if (isset($questionData['question_image'])) {
-                    $path = $questionData['question_image']->store('questions', 'public');
+                if (isset($validated['question_image'])) {
+                    $path = $validated['question_image']->store('questions', 'public');
                     $questionImagePath = 'storage/' . $path;
                 }
 
                 $question = Question::create([
                     'material_id' => $materialId,
-                    'question_text' => $questionData['question_text'] ?? null,
+                    'question_text' => $validated['question_text'] ?? null,
                     'question_image' => $questionImagePath,
                 ]);
 
-                $correctCount = collect($questionData['options'])->where('is_correct', true)->count();
+                $correctCount = collect($validated['options'])->where('is_correct', true)->count();
                 if ($correctCount !== 1) {
                     DB::rollBack();
                     return response()->json(['message' => 'Each question must have exactly one correct option.'], 422);
                 }
 
-                foreach ($questionData['options'] as $optionData) {
+                foreach ($validated['options'] as $optionData) {
                     $optionImagePath = null;
                     if (isset($optionData['option_image'])) {
                         $path = $optionData['option_image']->store('options', 'public');
@@ -138,8 +138,7 @@ class questionController extends Controller
             return response()->json(['message' => 'You can only update questions from your own materials'], 403);
         }
 
-        $validated = $request->validate([
-            'questions' => 'required|array|max:1',
+        $validated = $request->validate([            
             'question_text' => 'sometimes|string',
             'question_image' => 'sometimes|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'options' => 'sometimes|array|min:2|max:4',
@@ -147,29 +146,27 @@ class questionController extends Controller
             'options.*.option_text' => 'nullable|string',
             'options.*.option_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'options.*.is_correct' => 'required_with:options|boolean'
-        ]);
-
-        $questionData = $validated['questions'][0];
-
+        ]);                
+    
         DB::beginTransaction();
         try {
 
-            if (isset($questionData['question_text'])) {
-                $question->question_text = $questionData['question_text'];
+            if (isset($validated['question_text'])) {
+                $question->question_text = $validated['question_text'];
             }
 
-            if ($request->hasFile('questions.0.question_image')) {
+            if ($request->hasFile('question_image')) {
                 if ($question->question_image) {
                     Storage::disk('public')->delete(str_replace('storage/', '', $question->question_image));
                 }
 
-                $path = $request->file('questions.0.question_image')->store('questions', 'public');
+                $path = $request->file('question_image')->store('questions', 'public');
                 $question->question_image = 'storage/' . $path;
             }
 
             $question->save();
-            if (isset($questionData['options'])) {
-                $options = $questionData['options'];
+            if (isset($validated['options'])) {
+                $options = $validated['options'];
                 $correctCount = collect($options)->where('is_correct', true)->count();
 
                 if ($correctCount !== 1) {
@@ -193,7 +190,7 @@ class questionController extends Controller
                             }
 
                             // Gambar baru untuk option
-                            $fileKey = "questions.0.options.$index.option_image";
+                            $fileKey = "options.$index.option_image";
                             if ($request->hasFile($fileKey)) {
                                 if ($option->option_image) {
                                     Storage::disk('public')->delete(str_replace('storage/', '', $option->option_image));
@@ -211,7 +208,7 @@ class questionController extends Controller
                             'is_correct' => $optionData['is_correct'],
                         ]);
 
-                        $fileKey = "questions.0.options.$index.option_image";
+                        $fileKey = "options.$index.option_image";
                         if ($request->hasFile($fileKey)) {
                             $path = $request->file($fileKey)->store('options', 'public');
                             $newOption->option_image = 'storage/' . $path;
