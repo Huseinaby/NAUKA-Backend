@@ -267,7 +267,8 @@ class questionController extends Controller
         ], 200);
     }
 
-    public function storeResult(Request $request) {
+    public function storeResult(Request $request)
+    {
         $validated = $request->validate([
             'material_id' => 'required|exists:materials,id',
             'answers' => 'required|array',
@@ -286,13 +287,12 @@ class questionController extends Controller
 
         foreach ($answers as $questionId => $optionId) {
             $option = Option::where('id', $optionId)
-                            ->where('question_id', $questionId)
-                            ->first();
+                ->where('question_id', $questionId)
+                ->first();
 
             if ($option && $option->is_correct) {
                 $correctAnswers++;
-            }            
-
+            }
         }
 
         $score = $totalQuestions > 0 ? round(($correctAnswers / $totalQuestions) * 100) : 0;
@@ -303,7 +303,7 @@ class questionController extends Controller
             'score' => $score,
             'correct' => $correctAnswers,
             'wrong' => $totalQuestions - $correctAnswers,
-            'total_question' => $totalQuestions,            
+            'total_question' => $totalQuestions,
         ]);
 
         return response()->json([
@@ -315,6 +315,22 @@ class questionController extends Controller
                 'result_id' => $result->id
             ]
         ], 201);
-    
+    }
+
+    public function getResults ($materialId)
+    {
+        $user = Auth::user();
+        if (!$user) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $results = QuestionResult::where('user_id', $user->id)
+            ->where('material_id', $materialId)
+            ->get();
+
+        return response()->json([
+            'message' => 'Quiz results retrieved successfully',
+            'results' => $results
+        ], 200);
     }
 }
