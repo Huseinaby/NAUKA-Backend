@@ -362,4 +362,23 @@ class quizController extends Controller
             ]
         ], 200);
     }
+
+    public function getResults($subCategoryId)
+    {
+        $user = Auth::user();
+
+        if (!$user) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        $results = QuizResult::where('user_id', $user->id)
+            ->where('sub_category_id', $subCategoryId)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return response()->json([
+            'message' => 'Quiz results retrieved successfully',
+            'results' => $results
+        ], 200);
+    }
 }
