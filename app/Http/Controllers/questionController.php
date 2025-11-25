@@ -333,4 +333,19 @@ class questionController extends Controller
             'results' => $results
         ], 200);
     }
+
+    public function getAllResults()
+    {
+        $user = Auth::user();
+        if (!$user) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $results = QuestionResult::where('user_id', $user->id)->get();
+
+        return response()->json([
+            'message' => 'All quiz results retrieved successfully',
+            'results' => $results
+        ], 200);
+    }
 }

@@ -381,4 +381,22 @@ class quizController extends Controller
             'results' => $results
         ], 200);
     }
+
+    public function getAllResults()
+    {
+        $user = Auth::user();
+
+        if (!$user) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        $results = QuizResult::where('user_id', $user->id)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return response()->json([
+            'message' => 'All quiz results retrieved successfully',
+            'results' => $results
+        ], 200);
+    }
 }
