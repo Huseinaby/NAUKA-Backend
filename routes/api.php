@@ -43,6 +43,7 @@ Route::get('/materials/{id}/questions', [questionController::class, 'getByMateri
 Route::get('/materials/questions/{id}', [questionController::class, 'show'])->middleware('auth:sanctum');
 Route::put('/materials/questions/{id}', [questionController::class, 'update'])->middleware('auth:sanctum');
 Route::delete('/materials/questions/{id}', [questionController::class, 'destroy'])->middleware('auth:sanctum');
+Route::get('/materials/questions/result', [questionController::class, 'getAllResults'])->middleware('auth:sanctum');
 Route::get('/materials/questions/result/{materialId}', [questionController::class, 'getResults'])->middleware('auth:sanctum');
 Route::post('/materials/questions/result', [questionController::class, 'storeResult'])->middleware('auth:sanctum');
 
@@ -64,6 +65,7 @@ Route::post('/quizzes', [quizController::class, 'store'])->middleware('auth:sanc
 Route::post('/quizzes/batch', [quizController::class, 'storeBatch'])->middleware('auth:sanctum');
 Route::put('/quizzes/{id}', [quizController::class, 'update'])->middleware('auth:sanctum');
 Route::delete('/quizzes/{id}', [quizController::class, 'destroy'])->middleware('auth:sanctum');
+Route::get('/quizzes/result', [quizController::class, 'getAllResults'])->middleware('auth:sanctum');
 Route::get('/quizzes/result/{subCategoryId}', [quizController::class, 'getResults'])->middleware('auth:sanctum');
 Route::post('/quizzes/result', [quizController::class, 'resultStore'])->middleware('auth:sanctum');
 
